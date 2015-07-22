@@ -2,6 +2,7 @@ import requests
 import bs4
 import time
 import json
+import sys
 
 base_url = 'http://sfbay.craigslist.org'
 search_url = '/search/sfc/apa'
@@ -50,22 +51,24 @@ def get_attr_key(attr):
         return "ada"
 
 def get_listing_details(url):
+    print ("."),
+    sys.stdout.flush()
     response = requests.get(url)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
 
     if len(soup.select('div.mapaddress')) < 1:
-        # No map, toss it
-        # print "NO ADDRESS"
+        # No map address, skip it
         return
 
     results[url] = {}
 
+    post_date = soup.time.get_text()
+    results[url]['post_date'] = post_date
+
     price = soup.select('.price')[0].get_text()
-    # print price
     results[url]['price'] = price
 
     mapaddress = soup.select('div.mapaddress')[0].get_text()
-    # print mapaddress
     results[url]['mapaddress'] = mapaddress
 
     attrs = soup.select('.mapAndAttrs span')
@@ -74,14 +77,16 @@ def get_listing_details(url):
         key = get_attr_key(attr_text)
         if key:
             results[url][key] = attr_text
-        else:
-            print "Throwing away attr: " + str(attr_text)
+        # else:
+        #     print "Throwing away attr: " + str(attr_text)
     return
 
 def get_index_listing (offset):
     if not offset:
         offset = 0
     url = index_url + '?s=' + str(offset)
+    print ("*"),
+
     response = requests.get(url)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
 
@@ -93,8 +98,8 @@ def get_index_listing (offset):
         get_listing_details(listing_url)
 
 def loop_over_index_listings():
-    start = 400
-    end = 500
+    start = 0
+    end = 100 # 2500
     step = 100
     for i in xrange(start, end, step):
         # print i
@@ -106,5 +111,5 @@ def main():
 
 main()
 # get_listing_details('http://sfbay.craigslist.org//sfc/apa/5126515369.html')
-# get_listing_details('http://sfbay.craigslist.org/sfc/apa/5134263639.html')
+# get_listing_details('http://sfbay.craigslist.org/sfc/apa/5134263639.html') # No map
 print json.dumps(results)
