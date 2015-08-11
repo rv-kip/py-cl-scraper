@@ -51,8 +51,8 @@ def get_attr_key(attr):
         return "ada"
 
 def get_listing_details(url):
-    print ("."),
-    sys.stdout.flush()
+    #print ("."),
+    #sys.stdout.flush()
     response = requests.get(url)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
 
@@ -85,7 +85,6 @@ def get_index_listing (offset):
     if not offset:
         offset = 0
     url = index_url + '?s=' + str(offset)
-    print ("*"),
 
     response = requests.get(url)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
