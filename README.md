@@ -3,6 +3,9 @@ A CL Scraper to gather housing rental data in json format. Handles pagination.
 
 Usage:
 ```
-$ sudo pip install bs4
+(Python3)
+$ pip install -r requirements.txt
 $ python scrape.py
 ```
+
+Change `LISTING_PATH` as needed
